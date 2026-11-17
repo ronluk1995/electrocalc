@@ -1,0 +1,27 @@
+{
+  "id": "./index.html",
+  "name": "ElectroCalc 1.0 – Electrical Calculator",
+  "short_name": "ElectroCalc",
+  "description": "Offline electrical engineering calculator: Ohm's Law, Wire Cross-Section & Voltage Drop, Resistors, 1-Phase/3-Phase AC Power, and Unit Converter.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#040812",
+  "theme_color": "#040812",
+  "categories": ["utilities", "education", "productivity"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

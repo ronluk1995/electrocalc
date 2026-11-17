@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#050a14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>ElectroCalc 1.0 – Electrical Calculator</title>
+<style>
+  :root {
+    --bg-deep: #040812;
+    --bg-card: #0b1426;
+    --bg-card-hover: #101d36;
+    --bg-input: #070e1c;
+    --border-subtle: rgba(0, 212, 255, 0.22);
+    --border-glow: rgba(0, 212, 255, 0.65);
+    --neon-blue: #00d4ff;
+    --electric-blue: #2563eb;
+    --silver-light: #e2e8f0;
+    --silver-mid: #94a3b8;
+    --silver-dark: #475569;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --shadow-neon: 0 0 18px rgba(0, 212, 255, 0.18);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    background-color: var(--bg-deep);
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.13) 0%, transparent 55%),
+      linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 28px 28px, 28px 28px;
+    color: var(--silver-light);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    padding: 16px 16px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Top Header */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 2px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    cursor: pointer;
+  }
+
+  .logo-badge {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #0e1a33, #050a14);
+    border: 1.5px solid var(--border-glow);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.35), inset 0 0 10px rgba(0, 212, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .brand-text h1 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    background: linear-gradient(180deg, #ffffff 15%, #94a3b8 95%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ver-pill {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(0, 212, 255, 0.16);
+    border: 1px solid rgba(0, 212, 255, 0.45);
+    color: var(--neon-blue);
+    -webkit-text-fill-color: var(--neon-blue);
+  }
+
+  .brand-text p {
+    font-size: 0.65rem;
+    letter-spacing: 1.6px;
+    color: var(--neon-blue);
+    font-weight: 600;
+    margin-top: 1px;
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--silver-light);
+    height: 38px;
+    padding: 0 11px;
+    border-radius: 11px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+  }
+
+  .icon-btn:active, .icon-btn:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.25);
+    color: #fff;
+  }
+
+  /* Search Bar */
+  .search-wrap {
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--neon-blue);
+    opacity: 0.85;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 12px 14px 12px 42px;
+    color: #fff;
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-input::placeholder {
+    color: var(--silver-mid);
+  }
+
+  .search-input:focus {
+    border-color: var(--neon-blue);
+    box-shadow: var(--shadow-neon);
+  }
+
+  /* Home Grid */
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px;
+  }
+
+  .calc-card {
+    background: linear-gradient(160deg, rgba(16, 29, 54, 0.92), rgba(7, 13, 27, 0.96));
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 11px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .calc-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+    opacity: 0.7;
+  }
+
+  .calc-card:active {
+    transform: scale(0.97);
+  }
+
+  .calc-card:hover {
+    border-color: var(--border-glow);
+    box-shadow: var(--shadow-neon);
+  }
+
+  .calc-card.wide {
+    grid-column: span 2;
+    flex-direction: row;
+    text-align: left;
+    padding: 15px 18px;
+    gap: 16px;
+  }
+
+  .card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 15px;
+    background: radial-gradient(circle at 30% 30%, rgba(0, 212, 255, 0.18), rgba(4, 8, 18, 0.9));
+    border: 1px solid rgba(0, 212, 255, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 12px rgba(0, 212, 255, 0.12);
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.25;
+  }
+
+  .card-sub {
+    font-size: 0.74rem;
+    color: var(--silver-mid);
+    margin-top: 3px;
+    line-height: 1.3;
+  }
+
+  /* Calculator View Panel */
+  .view-panel {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .view-panel.active {
+    display: flex;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .back-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--neon-blue);
+    padding: 8px 12px;
+    border-radius: 11px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .panel-title {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .hint-text {
+    font-size: 0.78rem;
+    color: var(--silver-mid);
+    line-height: 1.4;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .field-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--silver-light);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .field-label span {
+    color: var(--neon-blue);
+    font-weight: 700;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  input[type="number"], select {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: var(--radius-md);
+    padding: 11px 12px;
+    color: #fff;
+    font-size: 0.98rem;
+    font-weight: 600;
+    outline: none;
+  }
+
+  input[type="number"]:focus, select:focus {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.22);
+  }
+
+  .unit-select {
+    width: 92px;
+    flex-shrink: 0;
+    font-size: 0.88rem;
+    color: var(--neon-blue);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 9px;
+  }
+
+  .btn-primary {
+    flex: 1;
+    background: linear-gradient(135deg, #00b4d8, #1d4ed8);
+    border: 1px solid var(--neon-blue);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 180, 216, 0.3);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-secondary {
+    background: var(--bg-input);
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    color: var(--silver-light);
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  .preset-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: var(--neon-blue);
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 5px 9px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .result-card {
+    background: linear-gradient(145deg, rgba(0, 212, 255, 0.12), rgba(11, 20, 38, 0.95));
+    border: 1px solid var(--border-glow);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .result-row:last-child {
+    border-bottom: none;
+  }
+
+  .result-key {
+    font-size: 0.82rem;
+    color: var(--silver-mid);
+  }
+
+  .result-val {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.35);
+  }
+
+  .result-val.accent {
+    color: var(--neon-blue);
+  }
+
+  .sub-tabs {
+    display: flex;
+    background: var(--bg-input);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .sub-tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--silver-mid);
+    border-radius: 9px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+  }
+
+  .sub-tab.active {
+    background: rgba(0, 212, 255, 0.18);
+    color: #fff;
+    border: 1px solid rgba(0, 212, 255, 0.45);
+  }
+
+  /* Resistor list items */
+  .res-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .res-tag {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--neon-blue);
+    width: 28px;
+  }
+
+  .del-btn {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    width: 38px;
+    height: 42px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Color bands preview */
+  .resistor-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0;
+  }
+
+  .res-lead {
+    width: 42px;
+    height: 4px;
+    background: linear-gradient(180deg, #e2e8f0, #64748b);
+  }
+
+  .res-body {
+    width: 170px;
+    height: 46px;
+    background: linear-gradient(180deg, #e6c79c, #c89d66);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 0 14px;
+    box-shadow: inset 0 -4px 8px rgba(0,0,0,0.35), 0 0 14px rgba(0, 212, 255, 0.15);
+  }
+
+  .band-stripe {
+    width: 11px;
+    height: 100%;
+    transition: background 0.2s;
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 15, 0.82);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .modal-backdrop.open {
+    display: flex;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glow);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.25);
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--silver-dark);
+    margin-top: auto;
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- HEADER -->
+  <header class="top-bar">
+    <div class="brand" onclick="goHome()">
+      <div class="logo-badge">
+        <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+          <defs>
+            <linearGradient id="silverGrad" x1="0" y1="0" x2="64" y2="64">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="50%" stop-color="#cbd5e1"/>
+              <stop offset="100%" stop-color="#64748b"/>
+            </linearGradient>
+            <linearGradient id="boltGrad" x1="20" y1="10" x2="44" y2="56">
+              <stop offset="0%" stop-color="#7dd3fc"/>
+              <stop offset="50%" stop-color="#00d4ff"/>
+              <stop offset="100%" stop-color="#2563eb"/>
+            </linearGradient>
+          </defs>
+          <path d="M21 50H10V43H16.5C13.2 39.2 11.5 34.3 11.5 28.8C11.5 17.5 20.5 9 32 9C43.5 9 52.5 17.5 52.5 28.8C52.5 34.3 50.8 39.2 47.5 43H54V50H43V43.2C45.3 39.6 46.5 34.8 46.5 29.2C46.5 20.8 40.3 15 32 15C23.7 15 17.5 20.8 17.5 29.2C17.5 34.8 18.7 39.6 21 43.2V50Z" fill="url(#silverGrad)"/>
+          <path d="M35 14L22 34H31.5L28.5 52L43 31H33.5L35 14Z" fill="url(#boltGrad)"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>ElectroCalc <span class="ver-pill">1.0</span></h1>
+        <p data-i18n="subtitle">ELECTRICAL CALCULATOR</p>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="langBtn" onclick="cycleLanguage()" title="Language">
+        🌐 <span id="langLabel">EN</span>
+      </button>
+      <button class="icon-btn" onclick="toggleSettings(true)" title="Settings">
+        ⚙️
+      </button>
+    </div>
+  </header>
+
+  <!-- HOME VIEW -->
+  <main id="homeView" class="view-panel active">
+    <div class="search-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search calculators..." oninput="filterCalculators()">
+    </div>
+
+    <div class="calc-grid" id="calcGrid">
+      <!-- 1. Ohm's Law -->
+      <div class="calc-card" data-keywords="ohm law voltage current resistance power prawo ohma napięcie prąd opór moc gesetz" onclick="openCalc('ohm')">
+        <div class="card-icon">
+          <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+            <polygon points="24,6 43,40 5,40" stroke="#00d4ff" stroke-width="2.6" fill="rgba(0,212,255,0.08)"/>
+            <line x1="14" y1="26" x2="34" y2="26" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="24" y1="26" x2="24" y2="40" stroke="#94a3b8" stroke-width="2"/>
+            <text x="24" y="22" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">U</text>
+            <text x="17" y="36" fill="#00d4ff" font-size="10" font-weight="800" text-anchor="middle">I</text>
+            <text x="31" y="36" fill="#00d4ff" font-size="10" font-weight="800" text-anchor="middle">R</text>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title" data-i18n="c1_title">Ohm's Law</div>
+          <div class="card-sub" data-i18n="c1_sub">V, I, R & Power</div>
+        </div>
+      </div>
+
+      <!-- 2. Wire Size & Voltage Drop -->
+      <div class="calc-card" data-keywords="cable wire cross section voltage drop przewód przekrój spadek napięcia kabel querschnitt" onclick="openCalc('cable')">
+        <div class="card-icon">
+          <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+            <rect x="6" y="16" width="24" height="16" rx="4" fill="#1d4ed8" stroke="#00d4ff" stroke-width="2"/>
+            <line x1="30" y1="20" x2="42" y2="20" stroke="#f59e0b" stroke-width="2.6" stroke-linecap="round"/>
+            <line x1="30" y1="24" x2="44" y2="24" stroke="#f59e0b" stroke-width="2.6" stroke-linecap="round"/>
+            <line x1="30" y1="28" x2="42" y2="28" stroke="#f59e0b" stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title" data-i18n="c2_title">Wire & Drop</div>
+          <div class="card-sub" data-i18n="c2_sub">Cable mm² & ΔU</div>
+        </div>
+      </div>
+
+      <!-- 3. Resistors -->
+      <div class="calc-card" data-keywords="resistor series parallel color code rezystory szeregowo równolegle kod paskowy widerstand" onclick="openCalc('resistor')">
+        <div class="card-icon">
+          <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+            <line x1="4" y1="24" x2="12" y2="24" stroke="#94a3b8" stroke-width="2.5"/>
+            <rect x="12" y="17" width="24" height="14" rx="4" fill="#0f172a" stroke="#00d4ff" stroke-width="2.2"/>
+            <line x1="17" y1="17" x2="17" y2="31" stroke="#ef4444" stroke-width="3"/>
+            <line x1="23" y1="17" x2="23" y2="31" stroke="#3b82f6" stroke-width="3"/>
+            <line x1="30" y1="17" x2="30" y2="31" stroke="#f59e0b" stroke-width="3"/>
+            <line x1="36" y1="24" x2="44" y2="24" stroke="#94a3b8" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title" data-i18n="c3_title">Resistors</div>
+          <div class="card-sub" data-i18n="c3_sub">Series, Parallel & Color</div>
+        </div>
+      </div>
+
+      <!-- 4. AC Power & Divider -->
+      <div class="calc-card" data-keywords="power divider ac 3 phase cos phi moc czynna bierna dzielnik napięcia leistung" onclick="openCalc('power')">
+        <div class="card-icon">
+          <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+            <rect x="8" y="10" width="32" height="28" rx="5" stroke="#00d4ff" stroke-width="2.2" fill="rgba(37,99,235,0.12)"/>
+            <path d="M13 25C16 17 20 17 24 25C28 33 32 33 35 25" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title" data-i18n="c4_title">Power & Divider</div>
+          <div class="card-sub" data-i18n="c4_sub">1Φ/3Φ AC & V-Divider</div>
+        </div>
+      </div>
+
+      <!-- 5. Unit Converter (wide card for 5-tile balance) -->
+      <div class="calc-card wide" data-keywords="unit converter units kw hp va mf przelicznik jednostek einheiten" onclick="openCalc('converter')">
+        <div class="card-icon">
+          <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+            <path d="M36 16A14 14 0 0 0 12 18" stroke="#00d4ff" stroke-width="2.6" stroke-linecap="round"/>
+            <polyline points="11,12 12,19 19,18" stroke="#00d4ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 32A14 14 0 0 0 36 30" stroke="#94a3b8" stroke-width="2.6" stroke-linecap="round"/>
+            <polyline points="37,36 36,29 29,30" stroke="#94a3b8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title" data-i18n="c5_title">Unit Converter</div>
+          <div class="card-sub" data-i18n="c5_sub">Voltage, Current, Resistance, Power (W/HP) & Capacitance</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CALCULATOR 1: OHM'S LAW -->
+  <section id="view-ohm" class="view-panel">
+    <div class="panel-header">
+      <button class="back-btn" onclick="goHome()">← <span data-i18n="back">Back</span></button>
+      <h2 class="panel-title" data-i18n="c1_title">Ohm's Law</h2>
+    </div>
+    <div class="box">
+      <p class="hint-text" data-i18n="ohm_hint">Enter any two values to calculate the remaining two.</p>
+      <div class="preset-chips">
+        <button class="chip" onclick="presetOhm(230, 10)">Test: 230 V, 10 A</button>
+        <button class="chip" onclick="presetOhm(12, 2)">12 V, 2 A</button>
+        <button class="chip" onclick="presetOhm(24, 0.5)">24 V, 0.5 A</button>
+      </div>
+      <div class="field-group">
+        <label class="field-label"><span data-i18n="voltage">Voltage (U)</span><span>V</span></label>
+        <input type="number" id="ohmV" step="any" placeholder="e.g. 230">
+      </div>
+      <div class="field-group">
+        <label class="field-label"><span data-i18n="current">Current (I)</span><span>A</span></label>
+        <input type="number" id="ohmI" step="any" placeholder="e.g. 10">
+      </div>
+      <div class="field-group">
+        <label class="field-label"><span data-i18n="resistance">Resistance (R)</span><span>Ω</span></label>
+        <input type="number" id="ohmR" step="any" placeholder="e.g. 23">
+      </div>
+      <div class="field-group">
+        <label class="field-label"><span data-i18n="power">Power (P)</span><span>W</span></label>
+        <input type="number" id="ohmP" step="any" placeholder="e.g. 2300">
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="calcOhm()" data-i18n="calculate">Calculate</button>
+        <button class="btn-secondary" onclick="clearOhm()" data-i18n="clear">Clear</button>
+      </div>
+      <div id="ohmResult" class="result-card" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR 2: WIRE SIZE & VOLTAGE DROP -->
+  <section id="view-cable" class="view-panel">
+    <div class="panel-header">
+      <button class="back-btn" onclick="goHome()">← <span data-i18n="back">Back</span></button>
+      <h2 class="panel-title" data-i18n="c2_title">Wire & Drop</h2>
+    </div>
+    <div class="box">
+      <div class="field-group">
+        <label class="field-label" data-i18n="system_type">System / Voltage</label>
+        <select id="cableSys">
+          <option value="ac1_230">1-Phase AC (230 V)</option>
+          <option value="ac3_400">3-Phase AC (400 V)</option>
+          <option value="dc_24">DC (24 V)</option>
+          <option value="dc_12">DC (12 V)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" data-i18n="conductor">Conductor Material</label>
+        <select id="cableMat">
+          <option value="0.0178">Copper (Cu) – 0.0178 Ω·mm²/m</option>
+          <option value="0.0286">Aluminum (Al) – 0.0286 Ω·mm²/m</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label"><span data-i18n="load_val">Load (Power or Current)</span></label>
+        <div class="input-row">
+          <input type="number" id="cableLoad" step="any" value="3500">
+          <select id="cableLoadUnit" class="unit-select">
+            <option value="W">W</option>
+            <option value="kW">kW</option>
+            <option value="A">A</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label"><span data-i18n="length">Cable Length (one-way)</span><span>m</span></label>
+        <input type="number" id="cableLen" step="any" value="25">
+      </div>
+      <div class="field-group">
+        <label class="field-label"><span data-i18n="section">Cross-section (S)</span><span>mm²</span></label>
+        <select id="cableSec">
+          <option value="1.5">1.5 mm²</option>
+          <option value="2.5" selected>2.5 mm²</option>
+          <option value="4">4 mm²</option>
+          <option value="6">6 mm²</option>
+          <option value="10">10 mm²</option>
+          <option value="16">16 mm²</option>
+          <option value="25">25 mm²</option>
+          <option value="35">35 mm²</option>
+          <option value="50">50 mm²</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="calcCable()" data-i18n="calculate">Calculate</button>
+      <div id="cableResult" class="result-card"></div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR 3: RESISTORS -->
+  <section id="view-resistor" class="view-panel">
+    <div class="panel-header">
+      <button class="back-btn" onclick="goHome()">← <span data-i18n="back">Back</span></button>
+      <h2 class="panel-title" data-i18n="c3_title">Resistors</h2>
+    </div>
+    <div class="box">
+      <div class="sub-tabs">
+        <button class="sub-tab active" id="tabResSP" onclick="switchResTab('sp')" data-i18n="series_parallel">Series / Parallel</button>
+        <button class="sub-tab" id="tabResColor" onclick="switchResTab('color')" data-i18n="color_code">4-Band Color</button>
+      </div>
+
+      <!-- Sub-view A: Series & Parallel -->
+      <div id="resSPView" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="preset-chips">
+          <button class="chip" onclick="presetRes([100, 200])">Test: 100 Ω + 200 Ω</button>
+          <button class="chip" onclick="presetRes([100, 100])">Test: 100 Ω + 100 Ω</button>
+        </div>
+        <div id="resList" style="display:flex; flex-direction:column; gap:8px;"></div>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="addResistor()" style="flex:1;" data-i18n="add_res">+ Add Resistor</button>
+          <button class="btn-primary" onclick="calcResistors()" style="flex:1;" data-i18n="calculate">Calculate</button>
+        </div>
+        <div id="resResult" class="result-card"></div>
+      </div>
+
+      <!-- Sub-view B: 4-Band Color Code -->
+      <div id="resColorView" style="display:none; flex-direction:column; gap:12px;">
+        <div class="resistor-visual">
+          <div class="res-lead"></div>
+          <div class="res-body">
+            <div class="band-stripe" id="visB1"></div>
+            <div class="band-stripe" id="visB2"></div>
+            <div class="band-stripe" id="visB3"></div>
+            <div class="band-stripe" id="visB4" style="margin-left:14px;"></div>
+          </div>
+          <div class="res-lead"></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Band 1 (1st Digit)</label>
+          <select id="band1" onchange="calcColorBand()"></select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Band 2 (2nd Digit)</label>
+          <select id="band2" onchange="calcColorBand()"></select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Band 3 (Multiplier)</label>
+          <select id="band3" onchange="calcColorBand()"></select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Band 4 (Tolerance)</label>
+          <select id="band4" onchange="calcColorBand()"></select>
+        </div>
+        <div id="colorResult" class="result-card"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR 4: AC POWER & VOLTAGE DIVIDER -->
+  <section id="view-power" class="view-panel">
+    <div class="panel-header">
+      <button class="back-btn" onclick="goHome()">← <span data-i18n="back">Back</span></button>
+      <h2 class="panel-title" data-i18n="c4_title">Power & Divider</h2>
+    </div>
+    <div class="box">
+      <div class="sub-tabs">
+        <button class="sub-tab active" id="tabPowAC" onclick="switchPowTab('ac')" data-i18n="ac_power">1Φ / 3Φ Power</button>
+        <button class="sub-tab" id="tabPowDiv" onclick="switchPowTab('div')" data-i18n="v_divider">Voltage Divider</button>
+      </div>
+
+      <div id="powACView" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="field-group">
+          <label class="field-label" data-i18n="phase_mode">Phase Mode</label>
+          <select id="acPhase">
+            <option value="1">1-Phase (P = U · I · cos φ)</option>
+            <option value="3">3-Phase (P = √3 · U · I · cos φ)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span data-i18n="voltage">Voltage (U)</span><span>V</span></label>
+          <input type="number" id="acU" value="230" step="any">
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span data-i18n="current">Current (I)</span><span>A</span></label>
+          <input type="number" id="acI" value="10" step="any">
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span>Power Factor (cos φ)</span><span>0.1 – 1.0</span></label>
+          <input type="number" id="acCos" value="0.95" min="0.1" max="1" step="0.01">
+        </div>
+        <button class="btn-primary" onclick="calcACPower()" data-i18n="calculate">Calculate</button>
+        <div id="acResult" class="result-card"></div>
+      </div>
+
+      <div id="powDivView" style="display:none; flex-direction:column; gap:12px;">
+        <div class="field-group">
+          <label class="field-label"><span>Input Voltage (Vin)</span><span>V</span></label>
+          <input type="number" id="divVin" value="12" step="any">
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span>Resistor R1 (Top)</span><span>Ω</span></label>
+          <input type="number" id="divR1" value="1000" step="any">
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span>Resistor R2 (Bottom)</span><span>Ω</span></label>
+          <input type="number" id="divR2" value="1000" step="any">
+        </div>
+        <button class="btn-primary" onclick="calcDivider()" data-i18n="calculate">Calculate</button>
+        <div id="divResult" class="result-card"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR 5: UNIT CONVERTER -->
+  <section id="view-converter" class="view-panel">
+    <div class="panel-header">
+      <button class="back-btn" onclick="goHome()">← <span data-i18n="back">Back</span></button>
+      <h2 class="panel-title" data-i18n="c5_title">Unit Converter</h2>
+    </div>
+    <div class="box">
+      <div class="field-group">
+        <label class="field-label" data-i18n="category">Category</label>
+        <select id="convCat" onchange="updateConvUnits()">
+          <option value="voltage">Voltage (V, mV, kV)</option>
+          <option value="current">Current (A, mA, kA)</option>
+          <option value="resistance">Resistance (Ω, kΩ, MΩ)</option>
+          <option value="power">Power (W, kW, HP)</option>
+          <option value="capacitance">Capacitance (pF, nF, µF, F)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" data-i18n="value">Value</label>
+        <div class="input-row">
+          <input type="number" id="convVal" value="1" step="any" oninput="runConvert()">
+          <select id="convFrom" class="unit-select" onchange="runConvert()"></select>
+        </div>
+      </div>
+      <div id="convResult" class="result-card"></div>
+    </div>
+  </section>
+
+  <footer class="footer-note">ElectroCalc 1.0 • Offline Ready Electrical Suite • <a href="privacy.html" style="color:#00d4ff;text-decoration:none;">Privacy Policy</a></footer>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-backdrop" id="settingsModal" onclick="if(event.target===this) toggleSettings(false)">
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="color:#fff; font-size:1.05rem;" data-i18n="settings">Settings</h3>
+      <button class="icon-btn" onclick="toggleSettings(false)">✕</button>
+    </div>
+    <div class="field-group">
+      <label class="field-label" data-i18n="language">Language</label>
+      <select id="langSelectModal" onchange="setLanguage(this.value)">
+        <option value="en">English (EN)</option>
+        <option value="pl">Polski (PL)</option>
+        <option value="de">Deutsch (DE)</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label class="field-label" data-i18n="precision">Decimal Precision</label>
+      <select id="precisionSelect" onchange="savePrecision(this.value)">
+        <option value="2" selected>2 decimals (0.00)</option>
+        <option value="3">3 decimals (0.000)</option>
+        <option value="4">4 decimals (0.0000)</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="toggleSettings(false)" data-i18n="done">Done</button>
+  </div>
+</div>
+
+<script>
+  let currentLang = 'en';
+  let precision = 2;
+
+  const i18n = {
+    en: {
+      subtitle: "ELECTRICAL CALCULATOR",
+      search_ph: "Search calculators...",
+      c1_title: "Ohm's Law",
+      c1_sub: "V, I, R & Power",
+      c2_title: "Wire & Drop",
+      c2_sub: "Cable mm² & ΔU",
+      c3_title: "Resistors",
+      c3_sub: "Series, Parallel & Color",
+      c4_title: "Power & Divider",
+      c4_sub: "1Φ/3Φ AC & V-Divider",
+      c5_title: "Unit Converter",
+      c5_sub: "Voltage, Current, Resistance, Power (W/HP) & Capacitance",
+      back: "Back",
+      ohm_hint: "Enter any two values to calculate the remaining two.",
+      voltage: "Voltage (U)",
+      current: "Current (I)",
+      resistance: "Resistance (R)",
+      power: "Power (P)",
+      calculate: "Calculate",
+      clear: "Clear",
+      system_type: "System / Voltage",
+      conductor: "Conductor Material",
+      load_val: "Load (Power or Current)",
+      length: "Cable Length (one-way)",
+      section: "Cross-section (S)",
+      series_parallel: "Series / Parallel",
+      color_code: "4-Band Color",
+      add_res: "+ Add Resistor",
+      ac_power: "1Φ / 3Φ Power",
+      v_divider: "Voltage Divider",
+      phase_mode: "Phase Mode",
+      category: "Category",
+      value: "Value",
+      settings: "Settings",
+      language: "Language",
+      precision: "Decimal Precision",
+      done: "Done",
+      series_res: "Series Total (R_ser)",
+      parallel_res: "Parallel Total (R_par)",
+      err_two: "Please enter exactly two positive values."
+    },
+    pl: {
+      subtitle: "KALKULATOR ELEKTRYCZNY",
+      search_ph: "Szukaj kalkulatora...",
+      c1_title: "Prawo Ohma",
+      c1_sub: "U, I, R oraz Moc",
+      c2_title: "Przewody i Spadek",
+      c2_sub: "Przekrój mm² i ΔU",
+      c3_title: "Rezystory",
+      c3_sub: "Szeregowo, równolegle i kolory",
+      c4_title: "Moc i Dzielnik",
+      c4_sub: "Moc AC 1F/3F i dzielnik U",
+      c5_title: "Przelicznik Jednostek",
+      c5_sub: "Napięcie, prąd, rezystancja, moc (W/KM) i pojemność",
+      back: "Wróć",
+      ohm_hint: "Wpisz dowolne dwie wartości, aby obliczyć pozostałe dwie.",
+      voltage: "Napięcie (U)",
+      current: "Prąd (I)",
+      resistance: "Rezystancja (R)",
+      power: "Moc (P)",
+      calculate: "Oblicz",
+      clear: "Wyczyść",
+      system_type: "Układ / Napięcie",
+      conductor: "Materiał żyły",
+      load_val: "Obciążenie (Moc lub Prąd)",
+      length: "Długość przewodu (w jedną stronę)",
+      section: "Przekrój żyły (S)",
+      series_parallel: "Szeregowo / Równolegle",
+      color_code: "Kod paskowy (4 paski)",
+      add_res: "+ Dodaj rezystor",
+      ac_power: "Moc AC 1F / 3F",
+      v_divider: "Dzielnik napięcia",
+      phase_mode: "Rodzaj sieci",
+      category: "Kategoria",
+      value: "Wartość",
+      settings: "Ustawienia",
+      language: "Język",
+      precision: "Dokładność miejsc po przecinku",
+      done: "Gotowe",
+      series_res: "Połączenie szeregowe (R_szer)",
+      parallel_res: "Połączenie równoległe (R_równ)",
+      err_two: "Wpisz dokładnie dwie dodatnie wartości."
+    },
+    de: {
+      subtitle: "ELEKTRO-RECHNER",
+      search_ph: "Rechner suchen...",
+      c1_title: "Ohmsches Gesetz",
+      c1_sub: "U, I, R & Leistung",
+      c2_title: "Leitung & Abfall",
+      c2_sub: "Querschnitt mm² & ΔU",
+      c3_title: "Widerstände",
+      c3_sub: "Reihe, Parallel & Farbcode",
+      c4_title: "Leistung & Teiler",
+      c4_sub: "1Φ/3Φ AC & Spannungsteiler",
+      c5_title: "Einheitenrechner",
+      c5_sub: "Spannung, Strom, Widerstand, Leistung (W/PS) & Kapazität",
+      back: "Zurück",
+      ohm_hint: "Geben Sie zwei beliebige Werte ein, um die anderen zu berechnen.",
+      voltage: "Spannung (U)",
+      current: "Stromstärke (I)",
+      resistance: "Widerstand (R)",
+      power: "Leistung (P)",
+      calculate: "Berechnen",
+      clear: "Löschen",
+      system_type: "System / Spannung",
+      conductor: "Leitermaterial",
+      load_val: "Last (Leistung oder Strom)",
+      length: "Kabellänge (einfach)",
+      section: "Querschnitt (S)",
+      series_parallel: "Reihe / Parallel",
+      color_code: "4-Ring Farbcode",
+      add_res: "+ Widerstand",
+      ac_power: "1Φ / 3Φ Leistung",
+      v_divider: "Spannungsteiler",
+      phase_mode: "Netzart",
+      category: "Kategorie",
+      value: "Wert",
+      settings: "Einstellungen",
+      language: "Sprache",
+      precision: "Dezimalstellen",
+      done: "Fertig",
+      series_res: "Reihenschaltung (R_ges)",
+      parallel_res: "Parallelschaltung (R_par)",
+      err_two: "Bitte genau zwei positive Werte eingeben."
+    }
+  };
+
+  function fmt(num) {
+    if (!isFinite(num)) return "—";
+    const rounded = Number(num.toFixed(precision));
+    return rounded.toString();
+  }
+
+  function formatOhms(ohms) {
+    if (ohms >= 1e6) return `${fmt(ohms / 1e6)} MΩ`;
+    if (ohms >= 1e3) return `${fmt(ohms / 1e3)} kΩ`;
+    return `${fmt(ohms)} Ω`;
+  }
+
+  function setLanguage(lang) {
+    currentLang = lang;
+    document.getElementById('langLabel').textContent = lang.toUpperCase();
+    document.getElementById('langSelectModal').value = lang;
+    const dict = i18n[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key]) el.textContent = dict[key];
+    });
+    document.getElementById('searchInput').placeholder = dict.search_ph;
+    calcResistors();
+  }
+
+  function cycleLanguage() {
+    const order = ['en', 'pl', 'de'];
+    const next = order[(order.indexOf(currentLang) + 1) % order.length];
+    setLanguage(next);
+  }
+
+  function savePrecision(val) {
+    precision = parseInt(val, 10);
+    calcCable();
+    calcResistors();
+    calcColorBand();
+    calcACPower();
+    calcDivider();
+    runConvert();
+  }
+
+  function toggleSettings(open) {
+    document.getElementById('settingsModal').classList.toggle('open', open);
+  }
+
+  function goHome() {
+    document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+    document.getElementById('homeView').classList.add('active');
+  }
+
+  function openCalc(name) {
+    document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+  }
+
+  function filterCalculators() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    document.querySelectorAll('.calc-card').forEach(card => {
+      const text = (card.innerText + ' ' + card.getAttribute('data-keywords')).toLowerCase();
+      card.style.display = text.includes(q) ? 'flex' : 'none';
+    });
+  }
+
+  // --- 1. OHM'S LAW ---
+  function presetOhm(v, i) {
+    clearOhm();
+    document.getElementById('ohmV').value = v;
+    document.getElementById('ohmI').value = i;
+    calcOhm();
+  }
+
+  function clearOhm() {
+    ['ohmV', 'ohmI', 'ohmR', 'ohmP'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('ohmResult').style.display = 'none';
+  }
+
+  function calcOhm() {
+    const vRaw = parseFloat(document.getElementById('ohmV').value);
+    const iRaw = parseFloat(document.getElementById('ohmI').value);
+    const rRaw = parseFloat(document.getElementById('ohmR').value);
+    const pRaw = parseFloat(document.getElementById('ohmP').value);
+
+    const hasV = !isNaN(vRaw) && vRaw > 0;
+    const hasI = !isNaN(iRaw) && iRaw > 0;
+    const hasR = !isNaN(rRaw) && rRaw > 0;
+    const hasP = !isNaN(pRaw) && pRaw > 0;
+
+    const count = [hasV, hasI, hasR, hasP].filter(Boolean).length;
+    const box = document.getElementById('ohmResult');
+    if (count !== 2) {
+      box.style.display = 'flex';
+      box.innerHTML = `<div style="color:#fca5a5; font-size:0.85rem;">${i18n[currentLang].err_two}</div>`;
+      return;
+    }
+
+    let V = vRaw, I = iRaw, R = rRaw, P = pRaw;
+    if (hasV && hasI) { R = V / I; P = V * I; }
+    else if (hasV && hasR) { I = V / R; P = (V * V) / R; }
+    else if (hasV && hasP) { I = P / V; R = (V * V) / P; }
+    else if (hasI && hasR) { V = I * R; P = I * I * R; }
+    else if (hasI && hasP) { V = P / I; R = P / (I * I); }
+    else if (hasR && hasP) { V = Math.sqrt(P * R); I = Math.sqrt(P / R); }
+
+    box.style.display = 'flex';
+    box.innerHTML = `
+      <div class="result-row"><span class="result-key">Voltage (U)</span><span class="result-val">${fmt(V)} V</span></div>
+      <div class="result-row"><span class="result-key">Current (I)</span><span class="result-val">${fmt(I)} A</span></div>
+      <div class="result-row"><span class="result-key">Resistance (R)</span><span class="result-val accent">${fmt(R)} Ω</span></div>
+      <div class="result-row"><span class="result-key">Power (P)</span><span class="result-val accent">${fmt(P)} W</span></div>
+    `;
+  }
+
+  // --- 2. CABLE & VOLTAGE DROP ---
+  function calcCable() {
+    const sys = document.getElementById('cableSys').value;
+    const rho = parseFloat(document.getElementById('cableMat').value);
+    const load = parseFloat(document.getElementById('cableLoad').value) || 0;
+    const unit = document.getElementById('cableLoadUnit').value;
+    const L = parseFloat(document.getElementById('cableLen').value) || 0;
+    const S = parseFloat(document.getElementById('cableSec').value);
+
+    let U = 230, is3Phase = false;
+    if (sys === 'ac3_400') { U = 400; is3Phase = true; }
+    else if (sys === 'dc_24') { U = 24; }
+    else if (sys === 'dc_12') { U = 12; }
+
+    let I = 0;
+    if (unit === 'A') I = load;
+    else {
+      const watts = unit === 'kW' ? load * 1000 : load;
+      I = is3Phase ? watts / (Math.sqrt(3) * U) : watts / U;
+    }
+
+    const factor = is3Phase ? Math.sqrt(3) : 2;
+    const dU = (factor * L * I * rho) / S;
+    const pct = (dU / U) * 100;
+    const lossW = factor * (L * rho / S) * I * I;
+
+    const sizes = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95];
+    const minS = sizes.find(sz => ((factor * L * I * rho) / sz) / U * 100 <= 3) || '> 95';
+    const pctColor = pct <= 3 ? '#10b981' : (pct <= 5 ? '#f59e0b' : '#ef4444');
+
+    document.getElementById('cableResult').innerHTML = `
+      <div class="result-row"><span class="result-key">Current (I)</span><span class="result-val">${fmt(I)} A</span></div>
+      <div class="result-row"><span class="result-key">Voltage Drop (ΔU)</span><span class="result-val" style="color:${pctColor}">${fmt(dU)} V (${fmt(pct)}%)</span></div>
+      <div class="result-row"><span class="result-key">Line Power Loss</span><span class="result-val">${fmt(lossW)} W</span></div>
+      <div class="result-row"><span class="result-key">Recommended (≤ 3%)</span><span class="result-val accent">${minS} mm²</span></div>
+    `;
+  }
+
+  // --- 3. RESISTORS ---
+  let resistorValues = [100, 200];
+
+  function renderResistorInputs() {
+    const list = document.getElementById('resList');
+    list.innerHTML = '';
+    resistorValues.forEach((val, idx) => {
+      const row = document.createElement('div');
+      row.className = 'res-item';
+      row.innerHTML = `
+        <span class="res-tag">R${idx + 1}</span>
+        <input type="number" step="any" value="${val}" oninput="resistorValues[${idx}] = parseFloat(this.value) || 0; calcResistors();">
+        ${resistorValues.length > 2 ? `<button class="del-btn" onclick="removeResistor(${idx})">✕</button>` : ''}
+      `;
+      list.appendChild(row);
+    });
+    calcResistors();
+  }
+
+  function addResistor() {
+    resistorValues.push(100);
+    renderResistorInputs();
+  }
+
+  function removeResistor(idx) {
+    resistorValues.splice(idx, 1);
+    renderResistorInputs();
+  }
+
+  function presetRes(arr) {
+    resistorValues = [...arr];
+    renderResistorInputs();
+  }
+
+  function calcResistors() {
+    const valid = resistorValues.filter(v => v > 0);
+    const box = document.getElementById('resResult');
+    if (valid.length === 0) {
+      box.innerHTML = '<div class="hint-text">Enter positive resistor values.</div>';
+      return;
+    }
+    const rSer = valid.reduce((a, b) => a + b, 0);
+    const invSum = valid.reduce((a, b) => a + (1 / b), 0);
+    const rPar = 1 / invSum;
+
+    box.innerHTML = `
+      <div class="result-row"><span class="result-key">${i18n[currentLang].series_res}</span><span class="result-val accent">${formatOhms(rSer)}</span></div>
+      <div class="result-row"><span class="result-key">${i18n[currentLang].parallel_res}</span><span class="result-val accent">${formatOhms(rPar)}</span></div>
+    `;
+  }
+
+  function switchResTab(tab) {
+    document.getElementById('tabResSP').classList.toggle('active', tab === 'sp');
+    document.getElementById('tabResColor').classList.toggle('active', tab === 'color');
+    document.getElementById('resSPView').style.display = tab === 'sp' ? 'flex' : 'none';
+    document.getElementById('resColorView').style.display = tab === 'color' ? 'flex' : 'none';
+  }
+
+  const bandColors = [
+    { name: 'Black (0)', val: 0, mult: 1, hex: '#111827' },
+    { name: 'Brown (1)', val: 1, mult: 10, hex: '#78350f', tol: '±1%' },
+    { name: 'Red (2)', val: 2, mult: 100, hex: '#dc2626', tol: '±2%' },
+    { name: 'Orange (3)', val: 3, mult: 1e3, hex: '#f97316' },
+    { name: 'Yellow (4)', val: 4, mult: 1e4, hex: '#eab308' },
+    { name: 'Green (5)', val: 5, mult: 1e5, hex: '#16a34a', tol: '±0.5%' },
+    { name: 'Blue (6)', val: 6, mult: 1e6, hex: '#2563eb', tol: '±0.25%' },
+    { name: 'Violet (7)', val: 7, mult: 1e7, hex: '#7c3aed', tol: '±0.1%' },
+    { name: 'Grey (8)', val: 8, mult: 1e8, hex: '#64748b' },
+    { name: 'White (9)', val: 9, mult: 1e9, hex: '#f8fafc' }
+  ];
+
+  const tolColors = [
+    { name: 'Gold (±5%)', tol: '±5%', hex: '#d4af37' },
+    { name: 'Silver (±10%)', tol: '±10%', hex: '#cbd5e1' },
+    { name: 'Brown (±1%)', tol: '±1%', hex: '#78350f' },
+    { name: 'Red (±2%)', tol: '±2%', hex: '#dc2626' }
+  ];
+
+  function initColorBands() {
+    const b1 = document.getElementById('band1');
+    const b2 = document.getElementById('band2');
+    const b3 = document.getElementById('band3');
+    const b4 = document.getElementById('band4');
+
+    bandColors.forEach((c, idx) => {
+      if (idx > 0) b1.add(new Option(c.name, idx));
+      b2.add(new Option(c.name, idx));
+      b3.add(new Option(`${c.name.split(' ')[0]} (×${c.mult >= 1e6 ? (c.mult/1e6)+'M' : c.mult >= 1e3 ? (c.mult/1e3)+'k' : c.mult})`, idx));
+    });
+    tolColors.forEach((t, idx) => b4.add(new Option(t.name, idx)));
+
+    b1.value = 1; // Brown
+    b2.value = 0; // Black
+    b3.value = 2; // Red -> 10 * 100 = 1 kOhm
+    b4.value = 0; // Gold
+    calcColorBand();
+  }
+
+  function calcColorBand() {
+    const d1 = bandColors[parseInt(document.getElementById('band1').value, 10)];
+    const d2 = bandColors[parseInt(document.getElementById('band2').value, 10)];
+    const m = bandColors[parseInt(document.getElementById('band3').value, 10)];
+    const t = tolColors[parseInt(document.getElementById('band4').value, 10)];
+
+    document.getElementById('visB1').style.background = d1.hex;
+    document.getElementById('visB2').style.background = d2.hex;
+    document.getElementById('visB3').style.background = m.hex;
+    document.getElementById('visB4').style.background = t.hex;
+
+    const ohms = (d1.val * 10 + d2.val) * m.mult;
+    document.getElementById('colorResult').innerHTML = `
+      <div class="result-row"><span class="result-key">Resistance</span><span class="result-val accent">${formatOhms(ohms)} ${t.tol}</span></div>
+    `;
+  }
+
+  // --- 4. AC POWER & DIVIDER ---
+  function switchPowTab(tab) {
+    document.getElementById('tabPowAC').classList.toggle('active', tab === 'ac');
+    document.getElementById('tabPowDiv').classList.toggle('active', tab === 'div');
+    document.getElementById('powACView').style.display = tab === 'ac' ? 'flex' : 'none';
+    document.getElementById('powDivView').style.display = tab === 'div' ? 'flex' : 'none';
+  }
+
+  function calcACPower() {
+    const ph = document.getElementById('acPhase').value;
+    const U = parseFloat(document.getElementById('acU').value) || 0;
+    const I = parseFloat(document.getElementById('acI').value) || 0;
+    const cos = Math.min(1, Math.max(0.01, parseFloat(document.getElementById('acCos').value) || 1));
+    const mult = ph === '3' ? Math.sqrt(3) : 1;
+
+    const S = mult * U * I;
+    const P = S * cos;
+    const Q = S * Math.sin(Math.acos(cos));
+
+    document.getElementById('acResult').innerHTML = `
+      <div class="result-row"><span class="result-key">Active Power (P)</span><span class="result-val accent">${fmt(P)} W (${fmt(P/1000)} kW)</span></div>
+      <div class="result-row"><span class="result-key">Apparent Power (S)</span><span class="result-val">${fmt(S)} VA</span></div>
+      <div class="result-row"><span class="result-key">Reactive Power (Q)</span><span class="result-val">${fmt(Q)} var</span></div>
+    `;
+  }
+
+  function calcDivider() {
+    const vin = parseFloat(document.getElementById('divVin').value) || 0;
+    const r1 = parseFloat(document.getElementById('divR1').value) || 0;
+    const r2 = parseFloat(document.getElementById('divR2').value) || 0;
+    if (r1 + r2 <= 0) return;
+
+    const vout = vin * (r2 / (r1 + r2));
+    const i_mA = (vin / (r1 + r2)) * 1000;
+    document.getElementById('divResult').innerHTML = `
+      <div class="result-row"><span class="result-key">Output Voltage (Vout)</span><span class="result-val accent">${fmt(vout)} V</span></div>
+      <div class="result-row"><span class="result-key">Divider Current</span><span class="result-val">${fmt(i_mA)} mA</span></div>
+    `;
+  }
+
+  // --- 5. UNIT CONVERTER ---
+  const unitDefs = {
+    voltage: { mV: 1e-3, V: 1, kV: 1e3 },
+    current: { µA: 1e-6, mA: 1e-3, A: 1, kA: 1e3 },
+    resistance: { mΩ: 1e-3, Ω: 1, kΩ: 1e3, MΩ: 1e6 },
+    power: { W: 1, kW: 1e3, MW: 1e6, "HP (KM)": 735.49875 },
+    capacitance: { pF: 1e-12, nF: 1e-9, µF: 1e-6, mF: 1e-3, F: 1 }
+  };
+
+  function updateConvUnits() {
+    const cat = document.getElementById('convCat').value;
+    const sel = document.getElementById('convFrom');
+    sel.innerHTML = '';
+    Object.keys(unitDefs[cat]).forEach(u => sel.add(new Option(u, u)));
+    if (cat === 'power') sel.value = 'kW';
+    if (cat === 'capacitance') sel.value = 'µF';
+    runConvert();
+  }
+
+  function runConvert() {
+    const cat = document.getElementById('convCat').value;
+    const val = parseFloat(document.getElementById('convVal').value) || 0;
+    const from = document.getElementById('convFrom').value;
+    const units = unitDefs[cat];
+    const base = val * units[from];
+
+    let html = '';
+    Object.entries(units).forEach(([u, factor]) => {
+      const converted = base / factor;
+      const display = (converted !== 0 && (Math.abs(converted) < 1e-4 || Math.abs(converted) >= 1e7))
+        ? converted.toExponential(precision)
+        : fmt(converted);
+      html += `<div class="result-row"><span class="result-key">${u}</span><span class="result-val ${u === from ? 'accent' : ''}">${display}</span></div>`;
+    });
+    document.getElementById('convResult').innerHTML = html;
+  }
+
+  // Init on load
+  renderResistorInputs();
+  initColorBands();
+  calcCable();
+  calcACPower();
+  calcDivider();
+  updateConvUnits();
+  // Register Service Worker for Offline & Android TWA Support
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
